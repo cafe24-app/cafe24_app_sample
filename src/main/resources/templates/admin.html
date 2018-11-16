@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>cafe24 sample</title>
+</head>
+<body>
+<h1>cafe24 sample</h1>
+<input type="text" placeholder="Mall_id" id="mall_id" th:value="${MallInfo.mall_id}" readonly>
+<input type="text" placeholder="user_name" th:value="${MallInfo.user_name}" readonly>
+<input type="text" placeholder="user_type" th:value="${MallInfo.user_type}" readonly>
+<hr>
+<button onclick="getProducts();">List all products</button>
+<hr>
+<div id="product_names"></div>
+
+<script type="application/javascript">
+    var element = document.getElementById("product_names");
+
+    function getProducts() {
+        while (element.hasChildNodes()) {
+            element.removeChild(element.firstChild);
+        }
+
+        var mall_id = document.getElementById("mall_id");
+        var opts = {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json; charset=utf-8"
+            }
+        };
+        //https://saleapp.cafe24.com/sample
+        fetch(mall_id.value + '/products', opts).then(function (response) {
+            return response.json();
+        }).then(function (result) {
+
+            console.log('success!');
+            if (result.code == 200) {
+                console.log(result.data.products);
+                result.data.products.forEach(function (product) {
+                    var para = document.createElement("p");
+                    var node = document.createTextNode(product.product_name + ' : ' + JSON.stringify(product));
+
+                    para.appendChild(node);
+                    element.appendChild(para);
+                });
+                console.log('OK!');
+            } else {
+                alert(result.message);
+                console.log('Error!' + result.code);
+            }
+        });
+    }
+</script>
+</body>
+</html>
